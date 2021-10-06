@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.10)
+set(ProjectName image-converter)
+
+# set the project name
+project(${ProjectName} C)
+
+
+file(GLOB SOURCES src/*)
+
+add_executable(${ProjectName} ${SOURCES})
+
+target_include_directories(${ProjectName} PUBLIC
+                           ${PROJECT_BINARY_DIR}
+                           )
