@@ -19,8 +19,4 @@ int loadPng(const char* path)
   return IMG_SUCCESS;
 }
 
-
-
-
-
 #endif
