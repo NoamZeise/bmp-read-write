@@ -11,12 +11,26 @@
 
 
 typedef struct s_img{
-  int width;
-  int height;
-  int channel_count;
-  int bytes_per_channel;
-  char* pixelData;
+  uint width;
+  uint height;
+  uint channel_count;
+  uint bytes_per_channel;
+  char* pixel_data;
 } img;
+
+
+void setPixel(img* image, uint x, uint y, char colour[4])
+{
+  if(x > image->width || x < 0 || y > image->height || y < 0)
+  {
+    printf("setPixel() params out of range error!");
+    return;
+  }
+  for(size_t i = 0; i < image->channel_count; i++)
+  {
+    image->pixel_data[(y * (_width * _bytesPerPixel)) + (x * _bytesPerPixel) + i] = colour[i];
+  }
+}
 
 
 char* loadFile(const char* path, size_t* img_file_size)
