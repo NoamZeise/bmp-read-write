@@ -10,17 +10,34 @@
 #define BMP_FILE_HEADER_BYTES 14
 #define BMP_INFO_HEADER_BYTES 40
 
-
-int loadBmp(const char* path)
+int bmpError(const char* path)
 {
+  printf("file at %s is not a valid BMP file\n", path);
+  return IMG_FAILURE;
+}
+
+
+img loadBmp(const char* path)
+{
+  img image;
+  image.width = 0;
+  image.height = 0;
+  image.channel_count = 0;
+  image.bytes_per_channel = 0;
+  image.pixel_data = NULL;
   size_t fileSize;
   char* img_file = loadFile(path, &fileSize);
-  if(!img_file) return IMG_FAILURE;
+  if(!img_file) return image;
+  if(fileSize < BMP_FILE_HEADER_BYTES + BMP_INFO_HEADER_BYTES)
+    return image;
+  if(img_file[0] != 'B' || img_file[1] != 'M')
+    return image;
 
+  size_t bmp_file_size = (size_t)(img_file[2] << 24 | img_file[3] << 16 | img_file[4] << 8 | img_file[5]);
+  printf("the size of the loaded bmp is %d bytes", (uint)bmp_file_size);
 
   free(img_file);
-  img_file = NULL;
-  return IMG_SUCCESS;
+  return image;
 }
 
 int saveBmp(img* image, const char* filename)

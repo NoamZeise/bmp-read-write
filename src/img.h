@@ -28,7 +28,8 @@ void setPixel(img* image, uint x, uint y, char colour[4])
   }
   for(size_t i = 0; i < image->channel_count; i++)
   {
-    image->pixel_data[(y * (_width * _bytesPerPixel)) + (x * _bytesPerPixel) + i] = colour[i];
+    image->pixel_data[(y * (image->width * image->bytes_per_channel * image->channel_count))
+                                  + (x *  image->bytes_per_channel * image->channel_count) + i] = colour[i];
   }
 }
 
