@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+typedef unsigned int uint;
 
 typedef struct s_img{
   uint width;

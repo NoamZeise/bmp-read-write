@@ -34,7 +34,7 @@ img loadBmp(const char* path)
     return image;
 
   size_t bmp_file_size = (size_t)(img_file[2] << 24 | img_file[3] << 16 | img_file[4] << 8 | img_file[5]);
-  printf("the size of the loaded bmp is %d bytes", (uint)bmp_file_size);
+  printf("the size of the loaded bmp is %d bytes", bmp_file_size);
 
   free(img_file);
   return image;
