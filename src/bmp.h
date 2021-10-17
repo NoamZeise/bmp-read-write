@@ -95,6 +95,39 @@ int fillImageInfoFromFile(img *img, unsigned char *file_data)
   return 1;
 }
 
+int fillPixelDataFromFile(img *img, unsigned char* pixel_data)
+{
+
+  size_t data_width = img->width * img->bytes_per_channel * img->channel_count;
+  size_t pixel_data_padding = 4 - (data_width % 4);
+  if (data_width % 4 == 0)
+    pixel_data_padding = 0;
+  data_width += pixel_data_padding;
+  size_t pixel_data_size = data_width * img->height;
+
+  return 0;
+  //needs fixed
+  q
+  size_t bytes_padded = 0;
+  for(size_t i = 0; i < pixel_data_size; i++)
+  {
+      size_t mod_width = i % (pixel_data_size / img->height);
+      //if end of row, pad data
+      if(mod_width <= (pixel_data_size / img->height) - pixel_data_padding
+      && mod_width >= (pixel_data_size / img->height) - pixel_data_padding)
+      {
+        bytes_padded++;
+        pixel_data[i] = 0x00;
+      }
+      else
+      {
+        pixel_data[i] = img->pixel_data[i - bytes_padded];
+      }
+  }
+
+  return 1;
+}
+
 
 img loadBmp(const char* path)
 {
@@ -127,6 +160,17 @@ img loadBmp(const char* path)
   }
 
   //read pixel data into pixel array
+  image.pixel_data = (unsigned char*)malloc(image.width * image.height * image.channel_count * image.bytes_per_channel);
+  if(!image.pixel_data)
+  {
+    printf("error at file: %s - failed to allocate memory for pixel data\n", path);
+    return image;
+  }
+  if(fillPixelDataFromFile(&image, &file_data[BMP_FILE_HEADER_BYTES + BMP_INFO_HEADER_BYTES]))
+  {
+    printf("error at file: %s - failed to fill pixel data from file\n", path);
+    return image;
+  }
 
   free(file_data);
   return image;
@@ -271,6 +315,8 @@ int saveBmp(img* image, const char* filename)
 
 void testBmpFileSaving()
 {
+
+//create test image
   img test_image = emptyImageStruct();
   test_image.width = 2000;
   test_image.height = 1000;
@@ -278,25 +324,22 @@ void testBmpFileSaving()
   test_image.bytes_per_channel = 1;
   size_t size = test_image.width * test_image.height * test_image.channel_count * test_image.bytes_per_channel;
   test_image.pixel_data = (unsigned char*)malloc(size);
+  //all white image
   for(size_t i = 0; i < size; i++)
     test_image.pixel_data[i] = 0xFF;
 
 //test saving
   saveBmp(&test_image, "test.bmp");
-
   printf("\nsaved image width: %u\n", test_image.width);
   printf("saved image height: %u\n", test_image.height);
   printf("saved image channels: %u\n", test_image.channel_count);
-
   free(test_image.pixel_data);
 
 //test loading
   test_image = loadBmp("test.bmp");
-
   printf("\nloaded image width: %u\n", test_image.width);
   printf("loaded image height: %u\n", test_image.height);
   printf("loaded image channels: %u\n", test_image.channel_count);
-
   free(test_image.pixel_data);
 }
 
