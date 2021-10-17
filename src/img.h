@@ -85,7 +85,6 @@ char* loadFile(const char* path, size_t* img_file_size)
     free(img_file_data);
     return NULL;
   }
-
   fclose(img_file);
   return img_file_data;
 }

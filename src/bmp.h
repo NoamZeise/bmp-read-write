@@ -13,7 +13,7 @@
 
 int checkValidBMPFile(size_t file_size, char *file_data)
 {
-   //check file is big enough 
+   //check file is big enough
   if(file_size < BMP_FILE_HEADER_BYTES + BMP_INFO_HEADER_BYTES)
   {
     printf("file is an inappropriate size\n");
@@ -26,17 +26,17 @@ int checkValidBMPFile(size_t file_size, char *file_data)
     return 0;
   }
   //check internal file specified size matches actual file size
-  size_t interal_bmp_file_size = (size_t)(file_data[2] | file_data[3] << 8 | file_data[4] << 16 | file_data[5] << 24);
-  if(interal_bmp_file_size != 0)
+  size_t internal_bmp_file_size = (size_t)(file_data[2] | file_data[3] << 8 | file_data[4] << 16 | file_data[5] << 24);
+  if(internal_bmp_file_size != 0)
   {
-    printf("error, file might be corrupt, the file's size was %d, but the file specified a size of %d", file_size, interal_bmp_file_size);
+    printf("error, file might be corrupt, the file's size was %zu, but the file specified a size of %zu", file_size, internal_bmp_file_size);
     return 0;
   }
   //check if file specified header size matches FILEHEADER + BITMAPINFOHEADER size
   size_t internal_bmp_header_size = (size_t)(file_data[10] | file_data[11] << 8 | file_data[12] << 16 | file_data[13] << 24);
   if(internal_bmp_header_size != BMP_FILE_HEADER_BYTES + BMP_INFO_HEADER_BYTES)
   {
-    printf("error, loader does not support a header of size %d, only BITMAPINFOHEADER is supported\n");
+    printf("error, loader does not support a header of size %zu, only BITMAPINFOHEADER is supported\n", internal_bmp_header_size);
     return 0;
   }
 
@@ -50,16 +50,16 @@ int fillImageInfoFromFile(img *img, char *file_data)
   char info_header[BMP_INFO_HEADER_BYTES];
 
   size_t interal_bmp_header_size =
-     (size_t)(file_data[ho + 0] | file_data[ho + 1] << 8 | file_data[ho + 2] << 16 | file_data[ho + 3] << 24);   
-  if(interal_bmp_header_size != BMP_INFO_HEADER_BYTES) 
+     (size_t)(file_data[ho + 0] | file_data[ho + 1] << 8 | file_data[ho + 2] << 16 | file_data[ho + 3] << 24);
+  if(interal_bmp_header_size != BMP_INFO_HEADER_BYTES)
   {
     printf("header is not BITMAPINFOHEADER, only BITMAPINFOHEADER is supported!\n");
     return 0;
   }
 
-  img->width = (uint)(file_data[ho + 4] | file_data[ho + 5] << 8 | file_data[ho + 6] << 16 | file_data[ho + 7] << 24);   
+  img->width = (uint)(file_data[ho + 4] | file_data[ho + 5] << 8 | file_data[ho + 6] << 16 | file_data[ho + 7] << 24);
 
-  img->height = (uint)(file_data[ho + 8] | file_data[ho + 9] << 8 | file_data[ho + 10] << 16 | file_data[ho + 11] << 24); 
+  img->height = (uint)(file_data[ho + 8] | file_data[ho + 9] << 8 | file_data[ho + 10] << 16 | file_data[ho + 11] << 24);
 	//no. of planes 12-13
 	//bits per pixel
 	size_t bits_per_pixel = (uint)(file_data[ho + 14] | file_data[ho + 15] << 8);
@@ -81,7 +81,7 @@ int fillImageInfoFromFile(img *img, char *file_data)
 	//type of compression 16 - 19
   //pixel data size 20-24
   /*
-  size_t pixel_data_size = 
+  size_t pixel_data_size =
     (size_t)(file_data[ho + 20] | file_data[ho + 21] << 8 | file_data[ho + 22] << 16 | file_data[ho + 23] << 24);
   size_t actual_data_width = pixel_data_size / img->height;
 
@@ -97,10 +97,10 @@ img loadBmp(const char* path)
 {
   img image = emptyImageStruct();
 
-  //load file 
+  //load file
   size_t file_size;
   char* file_data = loadFile(path, &file_size);
-  if(!file_data) 
+  if(!file_data)
   {
     free(file_data);
     printf("failed to load file at %s\n", path);
@@ -268,9 +268,16 @@ int saveBmp(img* image, const char* filename)
 
 void testBmpFileSaving()
 {
-
-  img test_image = loadBmp("test.bmp");
-
+  img test_image = emptyImageStruct();
+  test_image.width = 10;
+  test_image.height = 10;
+  test_image.channel_count = 4;
+  test_image.bytes_per_channel = 1;
+  size_t size = test_image.width * test_image.height * test_image.channel_count * test_image.bytes_per_channel;
+  test_image.pixel_data = (char*)malloc(size);
+  for(size_t i = 0; i < size; i++)
+    test_image.pixel_data[i] = 0xFF;
+  saveBmp(&test_image, "test.bmp");
   free(test_image.pixel_data);
 }
 
