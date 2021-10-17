@@ -7,15 +7,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef unsigned int uint;
 
 typedef struct s_img{
-  uint width;
-  uint height;
-  uint channel_count;
-  uint bytes_per_channel;
-  char* pixel_data;
+  uint32_t width;
+  uint32_t height;
+  uint32_t channel_count;
+  uint32_t bytes_per_channel;
+  unsigned char* pixel_data;
 } img;
 
 img emptyImageStruct()
@@ -30,7 +31,7 @@ img emptyImageStruct()
 }
 
 
-void setPixel(img* image, uint x, uint y, char colour[4])
+void setPixel(img* image, uint32_t x, uint32_t y, unsigned char colour[4])
 {
   if(x > image->width || x < 0 || y > image->height || y < 0)
   {
@@ -45,7 +46,7 @@ void setPixel(img* image, uint x, uint y, char colour[4])
 }
 
 
-char* loadFile(const char* path, size_t* img_file_size)
+unsigned char* loadFile(const char* path, size_t* img_file_size)
 {
   //open file
   FILE* img_file = fopen(path, "rb");
@@ -69,7 +70,7 @@ char* loadFile(const char* path, size_t* img_file_size)
   }
 
   //create buffer for file data
-  char *img_file_data = (char*)malloc(*img_file_size);
+  unsigned char *img_file_data = (unsigned char*)malloc(*img_file_size);
   if(!img_file_data)
   {
     fclose(img_file);
