@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include "bmp.h"
+
+#include "fun.h"
 
 int main(int argc, char** argv)
 {
-  printf("test of image converter\n");
-  testBmpFileSaving();
+  funImage();
 
   return 0;
 }
