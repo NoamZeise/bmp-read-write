@@ -9,7 +9,9 @@ file(GLOB SOURCES src/*)
 
 add_executable(${ProjectName} ${SOURCES})
 
+IF(UNIX)
 target_link_libraries(${ProjectName} m) #link C math library
+ENDIF()
 
 target_include_directories(${ProjectName} PUBLIC
                            ${PROJECT_BINARY_DIR}
