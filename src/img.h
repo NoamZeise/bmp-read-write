@@ -19,6 +19,8 @@ typedef struct s_img{
 
 img emptyImageStruct();
 
+img fillImageStruct(unsigned int width, unsigned int height);
+
 void setPixel(img* image, uint32_t x, uint32_t y, unsigned char* colour);
 
 unsigned char* loadFile(const char* path, size_t* img_file_size);

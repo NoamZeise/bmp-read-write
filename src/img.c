@@ -11,6 +11,18 @@ img emptyImageStruct()
   return image;
 }
 
+img fillImageStruct(unsigned int width, unsigned int height)
+{
+  img image;
+  image.width = width;
+  image.height = height;
+  image.channel_count = 4;
+  image.bytes_per_channel = 1;
+  size_t size = image.width * image.height * image.channel_count * image.bytes_per_channel;
+  image.pixel_data = (unsigned char*)malloc(size);
+  return image;
+}
+
 void setPixel(img* image, uint32_t x, uint32_t y, unsigned char* colour)
 {
   if(x > image->width || x < 0 || y > image->height || y < 0)

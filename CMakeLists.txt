@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(ProjectName image-converter)
+set(ProjectName bmp-read-write)
 
 # set the project name
 project(${ProjectName} C)
