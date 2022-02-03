@@ -34,7 +34,7 @@ void gen_mandelbrot(uint w, uint h, const char* filename)
     return;
   }
   img image = fillImageStruct(w, h);
-  printf("generating image - press c to cancel\n");
+  printf("generating image\n");
   float percent = 0;
   for(uint x = 0; x < image.width; x++)
   {
@@ -46,9 +46,9 @@ void gen_mandelbrot(uint w, uint h, const char* filename)
       setPixel(&image, x, y, colour);
     }
     percent = (float)(x) / (float)(image.width);
-    printf("%u%%\r", (uint)(percent * 100.0f));
+    printf("progress: %u%%\r", (uint)(percent * 100.0f));
   }
-  printf("100%%");
+  printf("progress: 100%%");
   printf("\nfinished generating image\n");
   saveBmp(&image, filename);
   printf("\nsaved image to %s\n", filename);

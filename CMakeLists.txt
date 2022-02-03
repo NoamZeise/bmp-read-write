@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(ProjectName bmp-read-write)
+set(ProjectName bmprw)
 
 # set the project name
 project(${ProjectName} C)
