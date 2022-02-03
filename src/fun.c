@@ -26,12 +26,12 @@ double within(double val, double size, double scale, double offset)
   return ((val / size) * scale) + offset;
 }
 
-void funImage()
+void gen_mandelbrot(unsigned int w, unsigned int h)
 {
-  //create test image
+  //create image
     img test_image = emptyImageStruct();
-    test_image.width = 10000;
-    test_image.height = 6000;
+    test_image.width = w;
+    test_image.height = h;
     test_image.channel_count = 4;
     test_image.bytes_per_channel = 1;
     size_t size = test_image.width * test_image.height * test_image.channel_count * test_image.bytes_per_channel;

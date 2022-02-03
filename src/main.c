@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-  funImage();
+  gen_mandelbrot(100, 60);
 
   return 0;
 }

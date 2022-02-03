@@ -5,4 +5,4 @@
 #include "bmp.h"
 
 
-void funImage();
+void gen_mandelbrot(unsigned int w, unsigned int h);
