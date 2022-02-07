@@ -4,7 +4,6 @@
 
 double inMandelbrot(double x, double y)
 {
-  //if(x>0)printf("x:%lf\ny:%lf\n\n", x, y);
   double _Complex c = x + (I*y);
   double _Complex z = 0;
   const int iterations = 200;
@@ -20,18 +19,59 @@ double inMandelbrot(double x, double y)
     return 1.0;
 }
 
-
 double within(double val, double size, double scale, double offset)
 {
   return ((val / size) * scale) + offset;
 }
 
-void gen_mandelbrot(uint w, uint h, const char* filename)
+
+struct thread_arg 
+{ 
+  uint x;
+  uint w;
+  uint h;
+  double xOff;
+  double yOff;
+  double xScale;
+  double yScale;
+  img* image;
+};
+
+struct thread_arg getArgs(uint x, uint w, uint h, double xOff, double yOff, double xScale, double yScale, img* image)
+{
+  struct thread_arg arg;
+  arg.x = x;
+  arg.w = w;
+  arg.h = h;
+  arg.xOff = xOff;
+  arg.yOff = yOff;
+  arg.xScale = xScale;
+  arg.yScale = yScale;
+  arg.image = image;
+  return arg;
+}
+
+void* setMandelbrot(void* args)
+{
+  struct thread_arg *a = (struct thread_arg *)args;
+
+  for(uint y = 0; y < a->h; y++)
+    {
+      float speed = inMandelbrot(within(a->x, a->w, a->xScale, a->xOff), within(y, a->h, a->yScale, a->yOff));
+      unsigned char col = (unsigned char)(speed * 255.0);
+      unsigned char colour[4] = {col, col, col, 0xFF};
+      setPixel(a->image, a->x, y, colour);
+    }
+
+  pthread_exit(NULL);
+}
+
+img old_genmandelbrot(uint w, uint h)
 {
   if(w > 10000 || h > 10000)
   {
     printf("width/height too large, max 10000 (would take too long to execute!)\n");
-    return;
+    return emptyImageStruct();
   }
   img image = fillImageStruct(w, h);
   printf("generating image\n");
@@ -50,8 +90,69 @@ void gen_mandelbrot(uint w, uint h, const char* filename)
   }
   printf("progress: 100%%");
   printf("\nfinished generating image\n");
-  saveBmp(&image, filename);
-  printf("\nsaved image to %s\n", filename);
-  free(image.pixel_data);
+  return image;
+}
 
+img gen_mandelbrot(uint w, uint h, double xOff, double yOff, double xScale, double yScale)
+{
+  if(w > 20000 || h > 20000)
+  {
+    printf("width/height too large, max 20000 (dificult to save such a big file!)\n");
+    return emptyImageStruct();
+  }
+  img image = fillImageStruct(w, h);
+  printf("generating image\n");
+  float percent = 0;
+
+  pthread_t *threads = malloc(w * sizeof(pthread_t));
+  struct thread_arg *args = malloc(w * sizeof(struct thread_arg));
+  pthread_attr_t attr;
+  uint joinedThreads = 0;
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+  uint index = 0;
+  for(uint x = 0; x < image.width; x++)
+  {
+    args[index] = getArgs(x, w, h, xOff, yOff, xScale, yScale, &image);
+    int err = pthread_create(&threads[index], &attr, setMandelbrot, (void*)&args[index]);
+    if(err)
+    {
+      printf("unable to create thread! index : %d\njoining unjoined threads\n", index);
+      for(uint i = joinedThreads; i < index - 1; i++)
+      {
+        int inerr = pthread_join(threads[i], NULL);
+        if(inerr)
+        {
+          printf("unable to join thread in buffer at %d!\n", index);
+          exit(-1);
+        }
+        joinedThreads++;
+      }
+      printf("finished joining thread\n");
+      index--;
+      x--;
+    } 
+    index++;
+    percent = (float)(x) / (float)(image.width);
+    printf("progress: %u%%\r", (uint)(percent * 100.0f));
+  }
+
+  pthread_attr_destroy(&attr);
+  for(uint i = joinedThreads; i < w; i++)
+  {
+    int err = pthread_join(threads[i], NULL);
+    if(err)
+    {
+      printf("unable to join thread at %d!\n", i);
+      exit(-1);
+    }
+  }
+  free(threads);
+  free(args);
+
+  printf("progress: %u%%\r", 100);
+  printf("\nfinished generating image\n");
+
+  return image;
 }

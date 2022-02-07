@@ -5,4 +5,6 @@
 #include "img.h"
 #include "bmp.h"
 
-void gen_mandelbrot(uint w, uint h, const char* filename);
+img gen_mandelbrot(uint w, uint h, double xOff, double yOff, double xScale, double yScale);
+
+img old_genmandelbrot(uint w, uint h);

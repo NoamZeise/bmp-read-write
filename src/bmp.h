@@ -7,6 +7,8 @@
 #include <string.h>
 #include "img.h"
 
+//#define LOG_FILE_SAVE
+
 
 #define BMP_FILE_HEADER_BYTES 14
 #define BMP_INFO_HEADER_BYTES 40

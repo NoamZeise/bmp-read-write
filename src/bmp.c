@@ -167,6 +167,11 @@ int saveBmp(img* image, const char* filename)
     printf("system not supported, char isn't 1 byte\n");
     return IMG_FAILURE;
   }
+  if(image->width == 0 || image->height == 0)
+  {
+    printf("image has either 0 width or 0 height\n");
+    return IMG_FAILURE;
+  }
 
   //data sizes
 
@@ -256,6 +261,16 @@ int saveBmp(img* image, const char* filename)
 	info_header[39] = 0;
 
   unsigned char* bmp_pixel_data = (unsigned char*)malloc(pixel_data_size);
+  if(bmp_pixel_data == NULL)
+  {
+    printf("Failed to allocate pixel data buffer for bmp");
+    return IMG_FAILURE;
+  }
+
+#ifdef LOG_FILE_SAVE
+  printf("bmp: allocated pixel data buffer\n");
+#endif
+
   size_t bytes_padded = 0;
   for(size_t i = 0; i < pixel_data_size; i++)
   {
@@ -281,6 +296,10 @@ int saveBmp(img* image, const char* filename)
   memcpy(bmp_data_buffer + header_size,           bmp_pixel_data,   pixel_data_size);
   free(bmp_pixel_data);
 
+#ifdef LOG_FILE_SAVE
+  printf("bmp: copied to final buffer\n");
+#endif
+
   //copy to image
   FILE* img_file = fopen(filename, "wb");
   if(!img_file)
@@ -288,11 +307,21 @@ int saveBmp(img* image, const char* filename)
     printf("failed to save bmp file %s", filename);
     return IMG_FAILURE;
   }
+#ifdef LOG_FILE_SAVE
+  printf("bmp: opened file for writing\n");
+#endif
   fwrite(bmp_data_buffer, file_size, 1, img_file);
+#ifdef LOG_FILE_SAVE
+  printf("bmp: wrote to file\n");
+#endif
 
   //close image file and free final buffer
   fclose(img_file);
   free(bmp_data_buffer);
+
+#ifdef LOG_FILE_SAVE
+  printf("bmp: closed file\n");
+#endif  
 
   return IMG_SUCCESS;
 }
